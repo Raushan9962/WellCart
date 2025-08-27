@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { authDataContext } from "../context/AuthContext";
 import axios from "axios";
+import { signInWithPopup} from "firebase/auth";
+import { auth, provider } from "../../utils/Firebase.js";
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -38,6 +40,20 @@ function Login() {
     }
   };
 
+  const googleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+     let user =result.user;
+     let Name = user.displayName;
+     let Email = user.email;
+  
+      const response = await axios.post(`${serverUrl}/api/auth/googleLogin`, { Name, Email }, { withCredentials: true });
+      console.log("Google sign-in success:", response.data);
+    } catch (error) {
+      console.error("Google sign-in error:", error);
+    }
+  };
+
   return (
     <div className="w-[100vw] h-[100vh] bg-gradient-to-l from-[#141414] to-[#0c2025] text-white flex flex-col items-center justify-start">
       {/* Header */}
@@ -56,7 +72,7 @@ function Login() {
           className="w-[90%] h-[90%] flex flex-col items-center justify-start gap-[20px]"
         >
           {/* Google Login */}
-          <div className="w-[90%] h-[50px] bg-[#42656cae] rounded-lg flex items-center justify-center gap-[10px] py-[20px] cursor-pointer">
+          <div className="w-[90%] h-[50px] bg-[#42656cae] rounded-lg flex items-center justify-center gap-[10px] py-[20px] cursor-pointer" onClick={googleLogin}>
             <img src={google} alt="google" className="w-[20px]" />
             Login with Google
           </div>

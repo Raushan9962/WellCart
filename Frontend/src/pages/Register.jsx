@@ -5,6 +5,9 @@ import { useNavigate } from "react-router-dom";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { authDataContext } from "../context/AuthContext";
 import axios from "axios";
+import { signInWithPopup} from "firebase/auth";
+import { auth, provider } from "../../utils/Firebase.js";
+
 
 function Register() {
   const [showPassword, setShowPassword] = useState(false);
@@ -34,15 +37,21 @@ function Register() {
     }
   };
  
-  //google authantication
-  const googleSignup = async () => {
-    try {
-      const result = await signInwithPopup(auth, provider);
-      console.log(result);
-    } catch (error) {
-      console.error(error);
-    }
+  // Google authentication
+const googleSignup = async () => {
+  try {
+    const result = await signInWithPopup(auth, provider);
+   let user =result.user;
+   let Name = user.displayName;
+   let Email = user.email;
+
+    const response = await axios.post(`${serverUrl}/api/auth/googleLogin`, { Name, Email }, { withCredentials: true });
+    console.log("Google sign-in success:", response.data);
+  } catch (error) {
+    console.error("Google sign-in error:", error);
   }
+};
+
 
 
 
@@ -64,9 +73,9 @@ function Register() {
           className="w-[90%] h-[90%] flex flex-col items-center justify-start gap-[20px]"
         >
           {/* Google Registration */}
-          <div className="w-[90%] h-[50px] bg-[#42656cae] rounded-lg flex items-center justify-center gap-[10px] py-[20px] cursor-pointer">
-            <img src={google} alt="google" className="w-[20px]" onClick={googleSignup} />
-            Registration with Google
+          <div className="w-[90%] h-[50px] bg-[#42656cae] rounded-lg flex items-center justify-center gap-[10px] py-[20px] cursor-pointer"  onClick={googleSignup}>
+            <img src={google}   alt="google"  className="w-[20px]" />
+            Registration with Google 
           </div>
 
           {/* Divider */}
