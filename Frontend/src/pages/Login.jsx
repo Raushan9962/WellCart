@@ -6,53 +6,35 @@ import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { authDataContext } from "../context/AuthContext";
 import axios from "axios";
 
-
 function Login() {
-  let [showPassword, setShowPassword] = useState(false);
-  let [email, setEmail] = useState("");
-  let [password, setPassword] = useState("");
-  let { serverUrl } = useContext(authDataContext);
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { serverUrl } = useContext(authDataContext);
 
-  let navigate = useNavigate();
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    
-      //fetch the data from the backend fetch method 
-//   try {
-//     let result = await fetch(`${serverUrl}/api/auth/login`, {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify({ email, password }),
-//     });
-//     let data = await result.json();
-//     if (data.success) {
-//       navigate("/home");
-//     }
-//   } catch (error) {
-//     console.log(error);
-//   }
-
-//or aecond method axios
-
-
 
     try {
-      let result = await axios.post(
+      const result = await axios.post(
         `${serverUrl}/api/auth/login`,
         { email, password },
         { withCredentials: true }
       );
-      console.log(result.data);
 
-      // if backend sends success flag, navigate to home
+      console.log("Login success:", result.data);
+
       if (result.data.success) {
         navigate("/home");
       }
     } catch (error) {
-      console.error("Login failed:", error);
+      if (error.response) {
+        console.error("Login failed:", error.response.data);
+      } else {
+        console.error("Login error:", error.message);
+      }
     }
   };
 
@@ -60,7 +42,7 @@ function Login() {
     <div className="w-[100vw] h-[100vh] bg-gradient-to-l from-[#141414] to-[#0c2025] text-white flex flex-col items-center justify-start">
       {/* Header */}
       <div
-        className="w-[100%] h-[80px] flex items-center justify-start px-[30px] gap-[10px] cursor-pointer"
+        className="w-full h-[80px] flex items-center justify-start px-[30px] gap-[10px] cursor-pointer"
         onClick={() => navigate("/")}
       >
         <img className="w-[40px]" src={Logo} alt="logo" />
@@ -68,7 +50,7 @@ function Login() {
       </div>
 
       {/* Login Box */}
-      <div className="max-w-[600px] w-[90%] h-[450px] bg-[#00000025] border-[1px] border-[#96969635] backdrop-blur-2xl rounded-lg shadow-lg flex items-center justify-center">
+      <div className="max-w-[600px] w-[90%] h-[450px] bg-[#00000025] border border-[#96969635] backdrop-blur-2xl rounded-lg shadow-lg flex items-center justify-center">
         <form
           onSubmit={handleLogin}
           className="w-[90%] h-[90%] flex flex-col items-center justify-start gap-[20px]"
@@ -80,7 +62,7 @@ function Login() {
           </div>
 
           {/* Divider */}
-          <div className="w-[100%] h-[20px] flex items-center justify-center gap-[10px]">
+          <div className="w-full h-[20px] flex items-center justify-center gap-[10px]">
             <div className="w-[40%] h-[1px] bg-[#96969635]"></div>
             OR
             <div className="w-[40%] h-[1px] bg-[#96969635]"></div>
@@ -90,17 +72,19 @@ function Login() {
           <div className="w-[90%] flex flex-col items-center justify-center gap-[15px]">
             <input
               type="email"
-              className="w-[100%] h-[50px] border-[2px] border-[#96969635] backdrop-blur-sm rounded-lg shadow-lg bg-transparent placeholder-[#ffffffc7] px-[20px] font-semibold"
+              autoComplete="email"
+              className="w-full h-[50px] border-2 border-[#96969635] backdrop-blur-sm rounded-lg shadow-lg bg-transparent placeholder-[#ffffffc7] px-[20px] font-semibold"
               placeholder="Email"
               required
               onChange={(e) => setEmail(e.target.value)}
               value={email}
             />
 
-            <div className="w-[100%] relative flex items-center">
+            <div className="w-full relative flex items-center">
               <input
                 type={showPassword ? "text" : "password"}
-                className="w-[100%] h-[50px] border-[2px] border-[#96969635] backdrop-blur-sm rounded-lg shadow-lg bg-transparent placeholder-[#ffffffc7] px-[20px] font-semibold"
+                autoComplete="current-password"
+                className="w-full h-[50px] border-2 border-[#96969635] backdrop-blur-sm rounded-lg shadow-lg bg-transparent placeholder-[#ffffffc7] px-[20px] font-semibold"
                 placeholder="Password"
                 required
                 onChange={(e) => setPassword(e.target.value)}
@@ -121,7 +105,7 @@ function Login() {
 
             <button
               type="submit"
-              className="w-[100%] h-[50px] bg-[#6060f5] rounded-lg flex items-center justify-center mt-[20px] text-[17px] font-semibold"
+              className="w-full h-[50px] bg-[#6060f5] rounded-lg flex items-center justify-center mt-[20px] text-[17px] font-semibold"
             >
               Login
             </button>
