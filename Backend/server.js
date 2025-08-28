@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import connectDb from "./config/database.js";
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/authRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 import cors from "cors";
 
 dotenv.config();
@@ -18,6 +19,7 @@ app.use(cors({
 }));
 
 app.use("/api/auth", authRouter);
+app.use("/api/user", userRoutes);
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {

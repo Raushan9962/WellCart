@@ -9,12 +9,12 @@ import { signInWithPopup} from "firebase/auth";
 import { auth, provider } from "../../utils/Firebase.js";
 
 function Login() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const { serverUrl } = useContext(authDataContext);
-
-  const navigate = useNavigate();
+  let [showPassword, setShowPassword] = useState(false);
+  let [email, setEmail] = useState("");
+ let[password, setPassword] = useState("");
+  let{ serverUrl } = useContext(authDataContext);
+  let {getCurrentUser} = useContext(authDataContext);
+ let navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
