@@ -1,47 +1,42 @@
-import React,{createContext} from 'react'
-import { useContext } from 'react'
-import { useState } from 'react'
-import { useEffect } from 'react'
-import axios from 'axios'
+import React, { createContext, useContext, useState, useEffect } from "react";
+import axios from "axios";
+import { authDataContext } from "./AuthContext"; // 👈 import your AuthContext
 
-export const UserDataContext = createContext()
- function UserContext({children}) {
+export const UserDataContext = createContext();
 
-{   let [userData, setUserData] = useState("");
-    let {serverUrl} = useContext(authDataContext);
-    
-    const getCurrentUser =async () =>{
-        try{
-            let result =await axios.get(serverUrl+"/api/user/getCurrentUser",{withCredentials:true});
-            setUserData(result.data);
-            console.log(result.data);
-        }
-        catch(error){
-              setUserData(null);
-            console.log("get user error")
-            return res.status(500).json({ message: `getCurrentUser error ${error}` })
-        }
+function UserContext({ children }) {
+  const [userData, setUserData] = useState(null);
+  const { serverUrl } = useContext(authDataContext); // ✅ now works
+
+  const getCurrentUser = async () => {
+    try {
+      let result = await axios.get(
+        serverUrl + "/api/user/getCurrentUser",
+        { withCredentials: true }
+      );
+      setUserData(result.data);
+      console.log(result.data);
+    } catch (error) {
+      setUserData(null);
+      console.error("get user error:", error.message);
     }
-    
-    useEffect(() => {
-        getCurrentUser();
-    }, []);
-    
-    
-    
-    
-    
-    
-    let value = { 
-        userData,setUserData,
-     };
+  };
+
+  useEffect(() => {
+    getCurrentUser();
+  }, []);
+
+  const value = {
+    userData,
+    setUserData,
+    getCurrentUser, // optional: expose this so components can refresh user
+  };
+
+  return (
+    <UserDataContext.Provider value={value}>
+      {children}
+    </UserDataContext.Provider>
+  );
 }
 
-
-    return (
-        <UserDataContext.Provider value={value}>
-            {children}
-        </UserDataContext.Provider>
-    )
-}
-export default UserContext
+export default UserContext;
