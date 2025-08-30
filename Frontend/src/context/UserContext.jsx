@@ -1,21 +1,24 @@
+// context/UserContext.jsx
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
-import { authDataContext } from "./AuthContext"; // 👈 import your AuthContext
+import { authDataContext } from "./AuthContext"; // import your AuthContext
 
+// Create context
 export const UserDataContext = createContext();
 
-function UserContext({ children }) {
+// Context provider component
+export function UserContextProvider({ children }) {
   const [userData, setUserData] = useState(null);
-  const { serverUrl } = useContext(authDataContext); // ✅ now works
+  const { serverUrl } = useContext(authDataContext); // ✅ pull serverUrl from AuthContext
 
   const getCurrentUser = async () => {
     try {
-      let result = await axios.get(
-        serverUrl + "/api/user/getCurrentUser",
+      const result = await axios.get(
+        `${serverUrl}/api/user/getCurrentUser`,
         { withCredentials: true }
       );
       setUserData(result.data);
-      console.log(result.data);
+      console.log("Current User:", result.data);
     } catch (error) {
       setUserData(null);
       console.error("get user error:", error.message);
@@ -29,7 +32,7 @@ function UserContext({ children }) {
   const value = {
     userData,
     setUserData,
-    getCurrentUser, // optional: expose this so components can refresh user
+    getCurrentUser, // ✅ exposed if needed
   };
 
   return (
@@ -39,4 +42,4 @@ function UserContext({ children }) {
   );
 }
 
-export default UserContext;
+export default UserContextProvider;
