@@ -7,6 +7,7 @@ import { authDataContext } from "../context/AuthContext";
 import axios from "axios";
 import { signInWithPopup} from "firebase/auth";
 import { auth, provider } from "../../utils/Firebase.js";
+import { getCurrentUser } from "../../../Backend/controller/userController.js";   
 
 
 function Register() {
@@ -26,11 +27,10 @@ function Register() {
         { name, email, password },
         { withCredentials: true }
       );
+      getCurrentUser();
+      navigate("/");
       console.log("Register success:", result.data);
 
-      if (result.data.success) {
-        navigate("/login");
-      }
     } catch (error) {
       console.error("Register failed:", error.response?.data || error.message);
       alert(error.response?.data?.message || "Registration failed");
@@ -40,13 +40,15 @@ function Register() {
   // Google authentication
 const googleSignup = async () => {
   try {
-    const result = await signInWithPopup(auth, provider);
+   const result = await signInWithPopup(auth, provider);
    let user =result.user;
    let Name = user.displayName;
    let Email = user.email;
 
     const response = await axios.post(`${serverUrl}/api/auth/googleLogin`, { Name, Email }, { withCredentials: true });
     console.log("Google sign-in success:", response.data);
+        getCurrentUser();
+      navigate("/");
   } catch (error) {
     console.error("Google sign-in error:", error);
   }

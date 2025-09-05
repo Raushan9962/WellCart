@@ -5,21 +5,22 @@ import { useNavigate } from "react-router-dom";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { authDataContext } from "../context/AuthContext";
 import axios from "axios";
-import { signInWithPopup} from "firebase/auth";
+import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "../../utils/Firebase.js";
 import { UserDataContext } from "../context/UserContext.jsx";
 
 function Login() {
-  let [showPassword, setShowPassword] = useState(false);
-  let [email, setEmail] = useState("");
- let[password, setPassword] = useState("");
-  let{ serverUrl } = useContext(authDataContext);
-  let {userData,getCurrentUser} = useContext(UserDataContext);
- let navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
+  const { serverUrl } = useContext(authDataContext);
+  const { getCurrentUser } = useContext(UserDataContext);
+  const navigate = useNavigate();
+
+  // ---- Email/Password login ----
   const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
       const result = await axios.post(
         `${serverUrl}/api/auth/login`,
@@ -28,8 +29,8 @@ function Login() {
       );
 
       console.log("Login success:", result.data);
-getCurrentUser();
-navigate("/");
+      getCurrentUser();
+      navigate("/");
     } catch (error) {
       if (error.response) {
         console.error("Login failed:", error.response.data);
@@ -39,19 +40,29 @@ navigate("/");
     }
   };
 
-  const googleLogin = async () => {
-    try {
-      const result = await signInWithPopup(auth, provider);
-     let user =result.user;
-     let Name = user.displayName;
-     let Email = user.email;
-  
-      const response = await axios.post(`${serverUrl}/api/auth/googleLogin`, { Name, Email }, { withCredentials: true });
-      console.log("Google sign-in success:", response.data);
-    } catch (error) {
-      console.error("Google sign-in error:", error);
-    }
-  };
+  // ---- Google login ----
+const googleLogin = async () => {
+  try {
+    const result = await signInWithPopup(auth, provider);
+
+    // get Google ID token from Firebase
+    const token = await result.user.getIdToken();
+
+    // send only the token to backend
+    const response = await axios.post(
+      `${serverUrl}/api/auth/googleLogin`,
+      { token },
+      { withCredentials: true }
+    );
+
+    console.log("Google sign-in success:", response.data);
+    getCurrentUser();
+    navigate("/");
+  } catch (error) {
+    console.error("Google sign-in error:", error);
+  }
+};
+
 
   return (
     <div className="w-[100vw] h-[100vh] bg-gradient-to-l from-[#141414] to-[#0c2025] text-white flex flex-col items-center justify-start">
@@ -61,7 +72,7 @@ navigate("/");
         onClick={() => navigate("/")}
       >
         <img className="w-[40px]" src={Logo} alt="logo" />
-        <h1 className="text-[22px] font-sans">OneCart</h1>
+        <h1 className="text-[22px] font-sans">WellCart</h1>
       </div>
 
       {/* Login Box */}
@@ -71,7 +82,10 @@ navigate("/");
           className="w-[90%] h-[90%] flex flex-col items-center justify-start gap-[20px]"
         >
           {/* Google Login */}
-          <div className="w-[90%] h-[50px] bg-[#42656cae] rounded-lg flex items-center justify-center gap-[10px] py-[20px] cursor-pointer" onClick={googleLogin}>
+          <div
+            className="w-[90%] h-[50px] bg-[#42656cae] rounded-lg flex items-center justify-center gap-[10px] py-[20px] cursor-pointer"
+            onClick={googleLogin}
+          >
             <img src={google} alt="google" className="w-[20px]" />
             Login with Google
           </div>

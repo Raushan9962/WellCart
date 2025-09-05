@@ -1,22 +1,27 @@
-const isAuth =async (req ,resizeBy,next) =>{
+import jwt from "jsonwebtoken";
 
-    try{
-        let token = req.cookies.token;
-        if(!token){
-            return res.status(400).json({message:"user does Not token"})
-        }
-      
-        let varifyToken = await jwt.verify(token,process.env.JWT_SECRET );
-      
-        if(!varifyToken){
-            return res.status(400).json({message:"user does Not token"})
-        }
-        req.userId = varifyToken.userId;
-        next();
+const isAuth = (req, res, next) => {
+  try {
+    const token = req.cookies.token;
+
+    if (!token) {
+      return res.status(401).json({ message: "No token, authorization denied" });
     }
-    catch(error){
-        console.log("is auth error")
-        return res.status(500).json({ message: `is auth error ${error}` })
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET );
+
+    if (!decoded) {
+      return res.status(401).json({ message: "Token invalid" });
     }
-}
-export default isAuth
+
+    // ✅ Attach decoded payload (e.g. { userId, email }) to req.user
+    req.user = decoded;
+
+    next();
+  } catch (error) {
+    console.error("isAuth error:", error.message);
+    return res.status(401).json({ message: "Token verification failed", error: error.message });
+  }
+};
+
+export default isAuth;

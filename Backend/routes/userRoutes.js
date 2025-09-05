@@ -1,8 +1,10 @@
 import express from "express";
 import { getCurrentUser } from "../controller/userController.js";
-import isAuth  from "../middleware/isAuth.js";
+import isAuth from "../middleware/isAuth.js";
 
-const userRoutes = express.Router();
-userRoutes.post("/getCurrentUser", isAuth, getCurrentUser);
+const router = express.Router();
 
-export default  userRoutes;
+//  Use GET, not POST, for fetching current user
+router.get("/getCurrentUser", isAuth, getCurrentUser);
+
+export default router;
