@@ -1,16 +1,16 @@
 import React, { createContext } from "react";
 
-export const authDataContext = createContext();  // <-- proper export
+export const AuthDataContext = createContext(); // ✅ Named export
 
 function AuthContext({ children }) {
-  let serverUrl = "http://localhost:3000";
+  let serverUrl = "http://localhost:3000"; // or your deployed backend URL
   let value = { serverUrl };
 
   return (
-    <authDataContext.Provider value={value}>
+    <AuthDataContext.Provider value={value}>
       {children}
-    </authDataContext.Provider>
+    </AuthDataContext.Provider>
   );
 }
-export default AuthContext;
 
+export default AuthContext; // ✅ Default export

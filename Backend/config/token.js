@@ -2,14 +2,14 @@ import jwt from "jsonwebtoken";
 
 export const tokenGen = (userId) => {
   try {
-    // sign is synchronous when not using a callback
+    // ✅ return the signed token
     return jwt.sign(
-      { userId },                // ✅ payload
-      process.env.JWT_SECRET ,    // ✅ must match everywhere
-      { expiresIn: "7d" }        // longer expiry
+      { userId }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: "7d" }
     );
   } catch (error) {
-    console.error("Token generation error:", error);
+    console.error("Token generation error:", error.message);
     return null;
   }
 };

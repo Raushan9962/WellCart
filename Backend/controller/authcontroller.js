@@ -32,8 +32,17 @@ export const register = async (req, res) => {
       sameSite: "Lax", // ✅ safer for cross-site dev
       maxAge: 7 * 24 * 60 * 60 * 1000, // ✅ 7 days
     });
+ 
+  res.status(201).json({ 
+  message: "User registered", 
+  token,           // ✅ send token
+  user: {
+    id: user._id,
+    name: user.name,
+    email: user.email,
+  },
+});
 
-    res.status(201).json({ message: "User registered", user });
   } catch (error) {
     console.error("Register error:", error);
     return res.status(500).json({ message: `Register error: ${error.message}` });
@@ -63,7 +72,17 @@ export const login = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.status(200).json({ message: "Login successful", user });
+   // After setting cookie
+res.status(200).json({ 
+  message: "Login successful", 
+  token,           // ✅ send token in response body
+  user: {          // ✅ avoid sending password
+    id: user._id,
+    name: user.name,
+    email: user.email,
+  },
+});
+
   } catch (error) {
     console.error("Login error:", error);
     return res.status(500).json({ message: `Login error: ${error.message}` });

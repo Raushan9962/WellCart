@@ -6,13 +6,13 @@ import { FaShoppingCart } from "react-icons/fa";
 import { UserDataContext } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { authDataContext } from "../context/AuthContext";
+import { AuthDataContext } from "../context/AuthContext";
 import { IoMdHome } from "react-icons/io";
 import { BiCollection } from "react-icons/bi";
 import { IoMdContact } from "react-icons/io";
 
 function Nav() {
-  const { serverUrl } = useContext(authDataContext);
+  const { serverUrl } = useContext(AuthDataContext);
   const { getCurrentUser, userData } = useContext(UserDataContext);
   const [showSearch, setShowSearch] = useState(false);
   const [showProfile, setShowProfile] = useState(false);

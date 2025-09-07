@@ -3,16 +3,17 @@ import Logo from "../assets/wellCart.png";
 import google from "../assets/google.png";
 import { useNavigate } from "react-router-dom";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
-import { authDataContext } from "../context/AuthContext";
+
 import axios from "axios";
 import { signInWithPopup} from "firebase/auth";
 import { auth, provider } from "../../utils/Firebase.js";
 import { getCurrentUser } from "../../../Backend/controller/userController.js";   
+import { AuthDataContext } from "../context/AuthContext";
 
 
 function Register() {
   const [showPassword, setShowPassword] = useState(false);
-  const { serverUrl } = useContext(authDataContext);
+  const { serverUrl } = useContext(AuthDataContext);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -40,15 +41,22 @@ function Register() {
   // Google authentication
 const googleSignup = async () => {
   try {
-   const result = await signInWithPopup(auth, provider);
-   let user =result.user;
-   let Name = user.displayName;
-   let Email = user.email;
+    const result = await signInWithPopup(auth, provider);
+    let user = result.user;
 
-    const response = await axios.post(`${serverUrl}/api/auth/googleLogin`, { Name, Email }, { withCredentials: true });
+    const name = user.displayName;
+    const email = user.email;
+
+    const response = await axios.post(
+      `${serverUrl}/api/auth/googleLogin`,
+      { name, email }, // ✅ lowercase keys to match backend
+      { withCredentials: true }
+    );
+
     console.log("Google sign-in success:", response.data);
-        getCurrentUser();
-      navigate("/");
+
+    getCurrentUser(); // refresh context
+    navigate("/");
   } catch (error) {
     console.error("Google sign-in error:", error);
   }

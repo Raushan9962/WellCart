@@ -3,7 +3,7 @@ import Logo from "../assets/wellCart.png";
 import google from "../assets/google.png";
 import { useNavigate } from "react-router-dom";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
-import { authDataContext } from "../context/AuthContext";
+import { AuthDataContext } from "../context/AuthContext.jsx"; // ✅ only need this
 import axios from "axios";
 import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "../../utils/Firebase.js";
@@ -14,7 +14,8 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { serverUrl } = useContext(authDataContext);
+  // ✅ correct usage
+  const { serverUrl } = useContext(AuthDataContext);
   const { getCurrentUser } = useContext(UserDataContext);
   const navigate = useNavigate();
 
@@ -41,17 +42,16 @@ function Login() {
   };
 
   // ---- Google login ----
-const googleLogin = async () => {
+ const googleLogin = async () => {
   try {
     const result = await signInWithPopup(auth, provider);
 
-    // get Google ID token from Firebase
-    const token = await result.user.getIdToken();
+    // Firebase gives user info directly
+    const { displayName, email } = result.user;
 
-    // send only the token to backend
     const response = await axios.post(
       `${serverUrl}/api/auth/googleLogin`,
-      { token },
+      { name: displayName, email }, // ✅ match backend expectation
       { withCredentials: true }
     );
 

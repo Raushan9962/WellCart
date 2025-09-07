@@ -1,48 +1,39 @@
-// context/UserContext.jsx
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
-import { authDataContext } from "./AuthContext"; // ✅ AuthContext must export authDataContext + Provider
+import { AuthDataContext } from "./AuthContext.jsx";
 
-// Create context
 export const UserDataContext = createContext();
 
-// Context provider component
-export function UserContextProvider({ children }) {
+export function UserContext({ children }) {
   const [userData, setUserData] = useState(null);
-  const { serverUrl } = useContext(authDataContext); // comes from AuthContext
+  const { serverUrl } = useContext(AuthDataContext);
 
-  // Fetch current user
   const getCurrentUser = async () => {
-    if (!serverUrl) return; // avoid calling with undefined
+    if (!serverUrl) return;
+
     try {
-      const { data } = await axios.get(
-        `${serverUrl}/api/user/getCurrentUser`,
-        { withCredentials: true }
-      );
-      setUserData(data);
-      console.log("✅ Current User:", data);
+      // ✅ Always send cookies
+      const result = await axios.get(`${serverUrl}/api/user/getCurrentUser`, {
+        withCredentials: true,
+      });
+
+      setUserData(result.data);
+      console.log("✅ User data:", result.data);
     } catch (error) {
       console.error("❌ get user error:", error.response?.data || error.message);
       setUserData(null);
     }
   };
 
-  // Run once on mount or when serverUrl changes
   useEffect(() => {
     getCurrentUser();
   }, [serverUrl]);
 
-  const value = {  
-    userData,
-    setUserData,
-    getCurrentUser, // exposed for manual refresh after login/logout
-  };
-
   return (
-    <UserDataContext.Provider value={value}>
+    <UserDataContext.Provider value={{ userData, setUserData, getCurrentUser }}>
       {children}
     </UserDataContext.Provider>
   );
 }
 
-export default UserContextProvider;
+export default UserContext;
