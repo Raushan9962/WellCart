@@ -1,81 +1,148 @@
-import React from 'react'
+import React, { useState } from "react";
+import { IoEyeOutline, IoEyeOffOutline, IoLogInOutline, IoLockClosed, IoMailOutline } from "react-icons/io5";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const navigate = useNavigate();
+
+  // states
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  // your server url (replace with your actual backend url)
+  const serverUrl = "http://localhost:3000";
+
+  // login handler
+  const AdminLogin = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const result = await axios.post(
+        `${serverUrl}/api/auth/AdminLogin`,
+        { email, password },
+        { withCredentials: true }
+      );
+      console.log("Login success:", result.data);
+
+      // redirect after login (optional)
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Login failed:", error.response?.data || error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="w-[100vw] h-[100vh] bg-gradient-to-l from-[#141414] to-[#0c2025] text-white flex flex-col items-center justify-start">
-      {/* Header */}
-      <div
-        className="w-full h-[80px] flex items-center justify-start px-[30px] gap-[10px] cursor-pointer"
-        onClick={() => navigate("/")}
-      >
-        <img src="https://res.cloudinary.com/dqo96kemf/image/upload/v1757340085/Adobe_Express_-_file_qavmku.png" alt="logo" className="h-[70px] w-[70px] mt-[10px]" />
-        <h1 className="text-[22px] font-sans">WellCart</h1>
-      </div>
-
-      {/* Login Box */}
-      <div className="max-w-[600px] w-[90%] h-[450px] bg-[#00000025] border border-[#96969635] backdrop-blur-2xl rounded-lg shadow-lg flex items-center justify-center">
-        <form
-
-          className="w-[90%] h-[90%] flex flex-col items-center justify-start gap-[20px]"
-        >
-
-          {/* Divider */}
-          <div className="w-full h-[20px] flex items-center justify-center gap-[10px]">
-            <div className="w-[40%] h-[1px] bg-[#96969635]"></div>
-           
-          </div>
-
-          {/* Input Fields */}
-          <div className="w-[90%] flex flex-col items-center justify-center gap-[15px]">
-            <input
-              type="email"
-              autoComplete="email"
-              className="w-full h-[50px] border-2 border-[#96969635] backdrop-blur-sm rounded-lg shadow-lg bg-transparent placeholder-[#ffffffc7] px-[20px] font-semibold"
-              placeholder="Email"
-              required
-              onChange={(e) => setEmail(e.target.value)}
-              value={email}
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Header */}
+        <div className="flex justify-center mb-8">
+          <div 
+            className="flex items-center gap-3 p-4 rounded-xl bg-black/20 backdrop-blur-sm cursor-pointer"
+            onClick={() => navigate("/")}
+          >
+            <img
+              src="https://res.cloudinary.com/dqo96kemf/image/upload/v1757340085/Adobe_Express_-_file_qavmku.png"
+              alt="logo"
+              className="h-12 w-12"
             />
-
-            <div className="w-full relative flex items-center">
-              <input
-                type={showPassword ? "text" : "password"}
-                autoComplete="current-password"
-                className="w-full h-[50px] border-2 border-[#96969635] backdrop-blur-sm rounded-lg shadow-lg bg-transparent placeholder-[#ffffffc7] px-[20px] font-semibold"
-                placeholder="Password"
-                required
-                onChange={(e) => setPassword(e.target.value)}
-                value={password}
-              />
-              {showPassword ? (
-                <IoEyeOffOutline
-                  className="w-[20px] h-[20px] cursor-pointer absolute right-3"
-                  onClick={() => setShowPassword(false)}
-                />
-              ) : (
-                <IoEyeOutline
-                  className="w-[20px] h-[20px] cursor-pointer absolute right-3"
-                  onClick={() => setShowPassword(true)}
-                />
-              )}
-            </div>
-
-            <button
-              type="submit"
-              className="w-full h-[50px] bg-[#6060f5] rounded-lg flex items-center justify-center mt-[20px] text-[17px] font-semibold"
-            >
-              Apply to Admin-login
-            </button>
-
-
-
-
-
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+              WellCart
+            </h1>
           </div>
-        </form>
+        </div>
+
+        {/* Login Box */}
+        <div className="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-2xl shadow-2xl overflow-hidden">
+          <div className="p-1 bg-gradient-to-r from-blue-500 to-purple-600">
+            <div className="bg-gray-900 rounded-t-xl p-4 text-center">
+              <h2 className="text-2xl font-bold flex items-center justify-center gap-2">
+                <IoLockClosed className="text-blue-400" />
+                ADMIN PORTAL
+              </h2>
+              <p className="text-gray-400 mt-2 text-sm">Enter your credentials to continue</p>
+            </div>
+          </div>
+          
+          <form onSubmit={AdminLogin} className="p-8">
+            <div className="space-y-5">
+              {/* Email Input */}
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <IoMailOutline className="h-5 w-5 text-gray-500" />
+                </div>
+                <input
+                  type="email"
+                  autoComplete="email"
+                  className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-gray-500"
+                  placeholder="Email address"
+                  required
+                  onChange={(e) => setEmail(e.target.value)}
+                  value={email}
+                />
+              </div>
+
+              {/* Password Input */}
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <IoLockClosed className="h-5 w-5 text-gray-500" />
+                </div>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  className="w-full pl-10 pr-10 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-gray-500"
+                  placeholder="Password"
+                  required
+                  onChange={(e) => setPassword(e.target.value)}
+                  value={password}
+                />
+                <button 
+                  type="button"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-200 transition-colors"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <IoEyeOffOutline className="w-5 h-5" />
+                  ) : (
+                    <IoEyeOutline className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+
+              {/* Login Button */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg flex items-center justify-center gap-2 font-semibold transition-all duration-300 shadow-lg hover:shadow-blue-500/30 disabled:opacity-50"
+              >
+                {isLoading ? (
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                ) : (
+                  <>
+                    <IoLogInOutline className="w-5 h-5" />
+                    Login to Admin Panel
+                  </>
+                )}
+              </button>
+            </div>
+            
+            <div className="text-center text-sm text-gray-500 mt-6 pt-4 border-t border-gray-800">
+              <p>Secure admin access only</p>
+            </div>
+          </form>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-8 text-center text-gray-500 text-sm">
+          <p>© {new Date().getFullYear()} WellCart. All rights reserved.</p>
+        </div>
       </div>
     </div>
   );
-}
+};
 
-export default Login
+export default Login;
