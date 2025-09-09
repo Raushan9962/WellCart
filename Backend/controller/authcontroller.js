@@ -1,8 +1,9 @@
 import User from "../model/userModel.js";
 import validator from "validator";
 import bcrypt from "bcrypt";
-import { tokenGen } from "../config/token.js";  
+import { tokenGen, tokenGen1 } from "../config/token.js";  
 
+// ==================== REGISTER ====================
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -24,24 +25,24 @@ export const register = async (req, res) => {
 
     const user = await User.create({ name, email, password: hashPassword });
 
-    const token = tokenGen(user._id); // ✅ returns { userId: user._id }
+    const token = tokenGen(user._id);
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // true in production (HTTPS)
-      sameSite: "Lax", // ✅ safer for cross-site dev
-      maxAge: 7 * 24 * 60 * 60 * 1000, // ✅ 7 days
+      secure: false, // set true in production (HTTPS)
+      sameSite: "Lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
  
-  res.status(201).json({ 
-  message: "User registered", 
-  token,           // ✅ send token
-  user: {
-    id: user._id,
-    name: user.name,
-    email: user.email,
-  },
-});
+    res.status(201).json({ 
+      message: "User registered", 
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+    });
 
   } catch (error) {
     console.error("Register error:", error);
@@ -49,6 +50,7 @@ export const register = async (req, res) => {
   }
 };
 
+// ==================== LOGIN ====================
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -72,16 +74,15 @@ export const login = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-   // After setting cookie
-res.status(200).json({ 
-  message: "Login successful", 
-  token,           // ✅ send token in response body
-  user: {          // ✅ avoid sending password
-    id: user._id,
-    name: user.name,
-    email: user.email,
-  },
-});
+    res.status(200).json({ 
+      message: "Login successful", 
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+    });
 
   } catch (error) {
     console.error("Login error:", error);
@@ -89,6 +90,7 @@ res.status(200).json({
   }
 };
 
+// ==================== LOGOUT ====================
 export const logOut = (req, res) => {
   try {
     res.clearCookie("token");
@@ -99,6 +101,7 @@ export const logOut = (req, res) => {
   }
 };
 
+// ==================== GOOGLE LOGIN ====================
 export const googleLogin = async (req, res) => {
   try {
     const { name, email } = req.body;
@@ -122,8 +125,35 @@ export const googleLogin = async (req, res) => {
     });
 
     res.status(200).json({ message: "Google login successful", user });
+
   } catch (error) {
     console.error("Google login error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+// ==================== ADMIN LOGIN ====================
+export const adminLogin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+      const token = tokenGen1(email);
+
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "Lax",
+        maxAge: 1 * 24 * 60 * 60 * 1000,
+      });
+
+      return res.status(200).json({ message: "Admin login successful", token });
+    } else {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+  } catch (error) {
+    console.error("Admin login error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };

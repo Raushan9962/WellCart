@@ -1,5 +1,4 @@
 import React, { useContext, useState } from "react";
-import logo from "../assets/wellCart.png";
 import { IoMdSearch } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
 import { FaShoppingCart } from "react-icons/fa";
@@ -40,7 +39,7 @@ function Nav() {
       <div className="w-full h-[70px] bg-[#ecfafaec] z-10 fixed top-0 flex items-center justify-between px-[30px] shadow-md shadow-black relative">
         {/* Logo + Title */}
         <div className="w-[30%] flex items-center justify-start gap-[10px]">
-          <img src={logo} alt="logo" className="w-[30px]" />
+          <img src="https://res.cloudinary.com/dqo96kemf/image/upload/v1757340085/Adobe_Express_-_file_qavmku.png" alt="logo" className="h-[70px] w-[70px] mt-[10px]" />
           <h1 className="text-[25px] text-black font-sans font-bold">WellCart</h1>
         </div>
 
