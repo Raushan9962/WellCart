@@ -13,4 +13,4 @@ function AuthContext({ children }) {
   );
 }
 
-export default AuthContext; // ✅ Default export
+export default AuthContext; 
