@@ -1,16 +1,17 @@
-import { createContext, useState } from "react";
+import React, { createContext, useState } from "react";
 
+// Create Auth Context
 export const authDataContext = createContext();
 
-const AuthContext = ({ children }) => {
-  let serverUrl = "http://localhost:3000"; 
- let value={serverUrl}
-  const [authData, setAuthData] = useState(value);
+const AuthProvider = ({ children }) => {
+  // You can set your backend URL here
+  const [serverUrl] = useState("http://localhost:3000");
+
   return (
-    <authDataContext.Provider value={{ authData, setAuthData }}>
+    <authDataContext.Provider value={{ serverUrl }}>
       {children}
     </authDataContext.Provider>
   );
 };
 
-export default AuthContext;
+export default AuthProvider;

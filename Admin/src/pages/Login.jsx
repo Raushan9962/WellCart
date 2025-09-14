@@ -1,40 +1,57 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { IoEyeOutline, IoEyeOffOutline, IoLogInOutline, IoLockClosed, IoMailOutline } from "react-icons/io5";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { adminDataContext } from "../context/AdminContext.jsx";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { loginAdmin, isAuthenticated, loading } = useContext(adminDataContext);
 
   // states
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  // your server url (replace with your actual backend url)
-  const serverUrl = "http://localhost:3000";
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [isAuthenticated, loading, navigate]);
 
   // login handler
   const AdminLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    try {
-      const result = await axios.post(
-        `${serverUrl}/api/auth/AdminLogin`,
-        { email, password },
-        { withCredentials: true }
-      );
-      console.log("Login success:", result.data);
+    setError("");
 
-      // redirect after login (optional)
-      navigate("/dashboard");
+    try {
+      const result = await loginAdmin(email, password);
+      
+      if (result.success) {
+        console.log("Login success:", result.data);
+        navigate("/dashboard", { replace: true });
+      } else {
+        setError(result.error || "Login failed");
+      }
     } catch (error) {
-      console.error("Login failed:", error.response?.data || error.message);
+      console.error("Login error:", error);
+      setError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Show loading while checking auth status
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white flex items-center justify-center p-4">
@@ -70,6 +87,13 @@ const Login = () => {
           
           <form onSubmit={AdminLogin} className="p-8">
             <div className="space-y-5">
+              {/* Error Message */}
+              {error && (
+                <div className="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg text-sm">
+                  {error}
+                </div>
+              )}
+
               {/* Email Input */}
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -83,6 +107,7 @@ const Login = () => {
                   required
                   onChange={(e) => setEmail(e.target.value)}
                   value={email}
+                  disabled={isLoading}
                 />
               </div>
 
@@ -99,11 +124,13 @@ const Login = () => {
                   required
                   onChange={(e) => setPassword(e.target.value)}
                   value={password}
+                  disabled={isLoading}
                 />
                 <button 
                   type="button"
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-200 transition-colors"
                   onClick={() => setShowPassword(!showPassword)}
+                  disabled={isLoading}
                 >
                   {showPassword ? (
                     <IoEyeOffOutline className="w-5 h-5" />
@@ -117,7 +144,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg flex items-center justify-center gap-2 font-semibold transition-all duration-300 shadow-lg hover:shadow-blue-500/30 disabled:opacity-50"
+                className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg flex items-center justify-center gap-2 font-semibold transition-all duration-300 shadow-lg hover:shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>

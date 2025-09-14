@@ -1,12 +1,14 @@
 import express from "express";
-import { getCurrentUser } from "../controller/userController.js";
+import { getCurrentUser, getAdmin } from "../controller/userController.js";
 import isAuth from "../middleware/isAuth.js";
 import adminAuth from "../middleware/adminAuth.js";
-import { getAdmin } from "../controller/userController.js";
 
 const userRouter = express.Router();
 
-//  Use GET, not POST, for fetching current user
+// GET current logged-in user
 userRouter.get("/getCurrentUser", isAuth, getCurrentUser);
-userRouter.get("/getadmin",adminAuth, getAdmin);
+
+// GET admin info (protected route)
+userRouter.get("/getAdmin", adminAuth, getAdmin);
+
 export default userRouter;

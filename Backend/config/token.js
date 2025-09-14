@@ -1,30 +1,36 @@
 import jwt from "jsonwebtoken";
 
-export const tokenGen = (userId) => {
+// ✅ For normal users
+export const tokenGen = (user) => {
   try {
-    // ✅ return the signed token
     return jwt.sign(
-      { userId }, 
-      process.env.JWT_SECRET, 
+      {
+        id: user._id,          // use consistent key (id instead of userId)
+        email: user.email,
+        role: "user",          // always assign role
+      },
+      process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
   } catch (error) {
-    console.error("Token generation error:", error.message);
+    console.error("Token generation error (user):", error.message);
     return null;
   }
 };
 
-
+// ✅ For admin login
 export const tokenGen1 = (email) => {
   try {
-    // ✅ return the signed token
     return jwt.sign(
-      {email }, 
-      process.env.JWT_SECRET, 
+      {
+        email,
+        role: "admin",         // make role explicit
+      },
+      process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
   } catch (error) {
-    console.error("Token generation error:", error.message);
+    console.error("Token generation error (admin):", error.message);
     return null;
   }
 };

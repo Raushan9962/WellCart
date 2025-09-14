@@ -1,11 +1,14 @@
 import React from 'react'
+import Nav from '../components/nav.jsx'
 
 const Home = () => {
   return (
     <div>
-        <div className='text-[30px] text-[red]'>Home</div>
+        <div className='w-[100vw] h-[100vh] bg-gradient-to-l from-[#141414] to-[#0c2025] text-[white] relative'>
+          <Nav/>
+          hello sir my name is  Chor        </div>
     </div>
   )
 }
 
-export default Home
+export default Home;

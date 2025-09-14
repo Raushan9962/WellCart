@@ -1,22 +1,28 @@
 import jwt from "jsonwebtoken";
+
 const adminAuth = (req, res, next) => {
+  try {
+    const token =
+      req.cookies?.token || req.headers.authorization?.split(" ")[1];
 
-    try{
-    let { token } = req.cookies;
     if (!token) {
-        return res.status(400).json({ message: "not Authorized Login" });
+      return res.status(401).json({ message: "Not authorized: No token" });
     }
-    let verifyToken = jwt.verify(token, process.env.JWT_SECRET);
-    if (!verifyToken) {
-        return res.status(400).json({ message: "not Authorized Login, invalid token" });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (!decoded || decoded.role !== "admin") {
+      return res.status(403).json({ message: "Forbidden: Not an admin" });
     }
-    req.adminEmail = process.env.ADMIN_EMAIL;
+
+    req.user = decoded; // 👈 yaha decoded me email + role dono aayenge
     next();
-    }catch(error){
-        console.log("adminAuth error:", error);
-        return res.status(500).json({message:`isAuth error ${error}`})
-    }
+  } catch (error) {
+    console.error("adminAuth error:", error);
+    return res
+      .status(500)
+      .json({ message: "adminAuth error", error: error.message });
+  }
+};
 
- } 
- export default adminAuth
-
+export default adminAuth;

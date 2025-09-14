@@ -7,10 +7,10 @@ import UserContext from "./context/UserContext.jsx";  // ✅ provider
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
-    <AuthContext>
-      <UserContext>
+    {/* <AuthContext> */}
+      {/* // <UserContext> */}
         <App />
-      </UserContext>
-    </AuthContext>
+      {/* </UserContext> */}
+    {/* </AuthContext> */}
   </BrowserRouter>
 );
