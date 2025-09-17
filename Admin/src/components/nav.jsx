@@ -1,14 +1,8 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { 
-  IoHomeOutline, 
-  IoAddCircleOutline, 
-  IoListOutline, 
-  IoReceiptOutline,
   IoLogOutOutline,
   IoPersonCircleOutline,
-  IoNotificationsOutline,
-  IoSearchOutline,
   IoChevronDownOutline
 } from "react-icons/io5";
 import { adminDataContext } from "../context/AdminContext.jsx";
@@ -30,33 +24,6 @@ const Nav = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navItems = [
-    {
-      name: "Dashboard",
-      path: "/dashboard",
-      icon: IoHomeOutline,
-      gradient: "from-blue-500 to-cyan-500"
-    },
-    {
-      name: "Add Product",
-      path: "/add",
-      icon: IoAddCircleOutline,
-      gradient: "from-green-500 to-emerald-500"
-    },
-    {
-      name: "Product List",
-      path: "/lists",
-      icon: IoListOutline,
-      gradient: "from-purple-500 to-pink-500"
-    },
-    {
-      name: "Orders",
-      path: "/orders",
-      icon: IoReceiptOutline,
-      gradient: "from-orange-500 to-red-500"
-    }
-  ];
-
   const handleLogout = async () => {
     try {
       await logoutAdmin();
@@ -66,8 +33,6 @@ const Nav = () => {
       navigate("/login", { replace: true });
     }
   };
-
-  const isActive = (path) => location.pathname === path;
 
   return (
     <nav
@@ -82,7 +47,7 @@ const Nav = () => {
           
           {/* Logo Section */}
           <div
-            className="flex items-center justify-start gap-4 flex-shrink-0"
+            className="flex items-center justify-start gap-4 flex-shrink-0 cursor-pointer group"
             onClick={() => navigate("/dashboard")}
           >
             <div className="relative">
@@ -101,60 +66,8 @@ const Nav = () => {
             </div>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const active = isActive(item.path);
-              return (
-                <Link
-                  key={item.name}
-                  to={item.path}
-                  className={`relative group px-4 py-2 rounded-xl transition-all duration-300 ${
-                    active ? "text-white" : "text-gray-400 hover:text-white"
-                  }`}
-                >
-                  {/* Background */}
-                  <div
-                    className={`absolute inset-0 rounded-xl transition-all duration-300 ${
-                      active
-                        ? `bg-gradient-to-r ${item.gradient} opacity-100`
-                        : "bg-gray-800/50 opacity-0 group-hover:opacity-100"
-                    }`}
-                  ></div>
-
-                  {/* Content */}
-                  <div className="relative flex items-center gap-2">
-                    <Icon
-                      className={`w-5 h-5 transition-all duration-300 ${
-                        active ? "scale-110" : "group-hover:scale-110"
-                      }`}
-                    />
-                    <span className="font-medium text-sm">{item.name}</span>
-                  </div>
-
-                  {/* Active Indicator */}
-                  {active && (
-                    <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                  )}
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* Right Section */}
+          {/* Right Section - Profile & Logout */}
           <div className="flex items-center gap-3">
-            {/* Search */}
-            <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-xl transition-all duration-200">
-              <IoSearchOutline className="w-5 h-5" />
-            </button>
-
-            {/* Notifications */}
-            <button className="relative p-2 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-xl transition-all duration-200">
-              <IoNotificationsOutline className="w-5 h-5" />
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-            </button>
-
             {/* Profile Dropdown */}
             <div className="relative">
               <button
@@ -187,17 +100,29 @@ const Nav = () => {
                 <div className="absolute right-0 mt-2 w-64 bg-gray-800/95 rounded-lg shadow-lg border border-gray-700">
                   <ul className="py-2">
                     <li
-                      onClick={() => navigate("/profile")}
-                      className="px-4 py-2 hover:bg-gray-700 cursor-pointer"
+                      onClick={() => {
+                        navigate("/profile");
+                        setShowProfile(false);
+                      }}
+                      className="px-4 py-2 hover:bg-gray-700 cursor-pointer text-gray-300 hover:text-white transition-colors"
                     >
                       Profile
                     </li>
-                    <li className="px-4 py-2 hover:bg-gray-700 cursor-pointer">
+                    <li
+                      onClick={() => {
+                        navigate("/settings");
+                        setShowProfile(false);
+                      }}
+                      className="px-4 py-2 hover:bg-gray-700 cursor-pointer text-gray-300 hover:text-white transition-colors"
+                    >
                       Settings
                     </li>
                     <li
-                      onClick={handleLogout}
-                      className="px-4 py-2 hover:bg-gray-700 cursor-pointer flex items-center gap-2 text-red-400"
+                      onClick={() => {
+                        handleLogout();
+                        setShowProfile(false);
+                      }}
+                      className="px-4 py-2 hover:bg-gray-700 cursor-pointer flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors"
                     >
                       <IoLogOutOutline /> Logout
                     </li>
@@ -205,6 +130,15 @@ const Nav = () => {
                 </div>
               )}
             </div>
+
+            {/* Direct Logout Button (Alternative) */}
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-3 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-all duration-200 border border-red-500/20 hover:border-red-500/40"
+            >
+              <IoLogOutOutline className="w-5 h-5" />
+              <span className="hidden md:block font-medium text-sm">Logout</span>
+            </button>
           </div>
         </div>
       </div>
