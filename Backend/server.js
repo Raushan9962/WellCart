@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import authRouter from "./routes/authRoutes.js";
 import userRouter from "./routes/userRoutes.js";
 import cors from "cors";
+import productRouter from "./routes/productRoutes.js";
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use(
 // -------------------- Routes --------------------
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
+app.use("/api/product", productRouter);
 
 // -------------------- Error Handling --------------------
 app.use((err, req, res, next) => {
